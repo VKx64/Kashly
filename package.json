@@ -19,6 +19,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.40.0",
+    "jsqr": "^1.4.0",
     "lucide-react": "^1.16.0",
     "pocketbase": "^0.26.9",
     "radix-ui": "^1.4.3",
