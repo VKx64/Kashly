@@ -16,9 +16,4 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  // Allow the production `vite preview` server (used in Docker) to be reached
-  // via any host/domain, not just localhost.
-  preview: {
-    allowedHosts: true,
-  },
 })

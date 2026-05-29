@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1
 
-FROM node:22-alpine
+# ---- Build the static bundle ----
+FROM node:22-alpine AS build
 WORKDIR /app
 
 # Install dependencies against the committed lockfile for reproducible builds
@@ -15,6 +16,12 @@ ENV VITE_POCKETBASE_URL=$VITE_POCKETBASE_URL
 COPY . .
 RUN npm run build
 
-# Serve the static build with Vite's built-in preview server (SPA fallback included)
+# ---- Serve the static files ----
+# `serve` is a tiny static file server with SPA fallback (-s). Nginx Proxy
+# Manager sits in front of this and handles domains/TLS.
+FROM node:22-alpine AS runtime
+WORKDIR /app
+RUN npm install -g serve
+COPY --from=build /app/dist ./dist
 EXPOSE 80
-CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0", "--port", "80"]
+CMD ["serve", "-s", "dist", "-l", "80"]
