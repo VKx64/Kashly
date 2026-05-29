@@ -27,3 +27,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Personal shell / tool configuration (never belongs in the repo)
+.bashrc
+.bash_profile
+.profile
+.zshrc
+.zprofile
+.gitconfig
+.ripgreprc
+
+# Claude Code machine-local settings (keep shared .claude/ config tracked)
+.claude/settings.local.json

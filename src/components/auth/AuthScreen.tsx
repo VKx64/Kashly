@@ -1,30 +1,6 @@
-import type { Dispatch, FormEvent, SetStateAction } from 'react'
-import {
-  AlertCircle,
-  CheckCircle2,
-  Loader2,
-  LockKeyhole,
-  ShieldCheck,
-  Sparkles,
-  TrendingUp,
-  WalletCards,
-} from 'lucide-react'
-
-import { BrandMark } from '@/components/brand/BrandMark'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { type Dispatch, type FormEvent, type SetStateAction, useState } from 'react'
+import { motion } from 'framer-motion'
+import { Eye, EyeOff } from 'lucide-react'
 
 interface AuthScreenProps {
   authMode: 'login' | 'register'
@@ -55,229 +31,142 @@ export function AuthScreen({
   pocketBaseUrl,
   onSubmit,
 }: AuthScreenProps) {
+  const [showPassword, setShowPassword] = useState(false)
+
   return (
-    <main className="min-h-svh bg-[radial-gradient(circle_at_12%_18%,rgba(15,118,110,0.14),transparent_28%),linear-gradient(135deg,#faf7ef_0%,#f8fbf8_48%,#eef7f5_100%)] px-4 py-5 text-foreground sm:px-6 lg:px-8">
-      <div className="mx-auto grid min-h-[calc(100svh-2.5rem)] w-full max-w-6xl items-center gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-        <section className="order-2 grid gap-6 lg:order-1">
-          <BrandMark />
-          <div className="max-w-2xl space-y-5">
-            <Badge
-              variant="outline"
-              className="border-primary/20 bg-background/70 text-primary"
-            >
-              <Sparkles aria-hidden="true" />
-              Editorial finance workspace
-            </Badge>
-            <div className="space-y-3">
-              <h1 className="text-4xl font-semibold leading-tight tracking-normal text-balance sm:text-5xl">
-                Your money map, written like a ledger.
-              </h1>
-              <p className="max-w-xl text-base leading-7 text-muted-foreground">
-                Track cash, bank accounts, transfers, and everyday spending in
-                a private workspace built around quick manual entry.
-              </p>
-            </div>
+    <main className="flex min-h-svh items-center justify-center bg-zinc-950 px-4 py-10">
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25, ease: 'easeOut' }}
+        className="w-[min(92vw,400px)]"
+      >
+        {/* Wordmark */}
+        <div className="mb-6 text-center">
+          <p className="text-2xl font-semibold tracking-tight text-white">
+            kashley<span className="ml-0.5 text-zinc-500">.</span>
+          </p>
+          <p className="mt-1 text-sm text-zinc-500">
+            {authMode === 'login'
+              ? 'Sign in to your finances'
+              : 'Create your account'}
+          </p>
+        </div>
+
+        {/* Card */}
+        <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.04] p-6 shadow-xl shadow-black/40">
+          {/* Mode toggle */}
+          <div className="mb-5 grid grid-cols-2 gap-1 rounded-lg bg-black/20 p-1">
+            {(['login', 'register'] as const).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => setAuthMode(mode)}
+                className={`rounded-md py-1.5 text-xs font-medium transition-colors ${
+                  authMode === mode
+                    ? 'bg-white text-zinc-950'
+                    : 'text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                {mode === 'login' ? 'Login' : 'Register'}
+              </button>
+            ))}
           </div>
 
-          <MoneyPreview />
-        </section>
-
-        <Card className="order-1 border-primary/10 bg-background/90 shadow-xl shadow-primary/5 backdrop-blur lg:order-2">
-          <CardHeader className="gap-4">
-            <div className="flex items-center justify-between gap-3">
-              <Badge
-                variant="secondary"
-                className="bg-primary/10 text-primary hover:bg-primary/10"
-              >
-                <ShieldCheck aria-hidden="true" />
-                Private workspace
-              </Badge>
-              <Badge variant="outline">PHP</Badge>
-            </div>
-            <div className="space-y-2">
-              <CardTitle className="text-2xl">
-                {authMode === 'login' ? 'Welcome back' : 'Create your ledger'}
-              </CardTitle>
-              <CardDescription>
-                {authMode === 'login'
-                  ? 'Sign in to continue tracking your balances and activity.'
-                  : 'Start with a secure account, then add your first balance source.'}
-              </CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <form className="grid gap-5" onSubmit={onSubmit}>
-              <Tabs
-                value={authMode}
-                onValueChange={(value) =>
-                  setAuthMode(value as 'login' | 'register')
-                }
-              >
-                <TabsList className="grid h-10 w-full grid-cols-2 rounded-md bg-secondary/80">
-                  <TabsTrigger value="login">Login</TabsTrigger>
-                  <TabsTrigger value="register">Register</TabsTrigger>
-                </TabsList>
-              </Tabs>
-
-              {authMode === 'register' && (
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
-                    autoComplete="name"
-                    value={name}
-                    onChange={(event) => setName(event.target.value)}
-                    placeholder="Ashley Santos"
-                  />
-                </div>
-              )}
-
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  required
-                  autoComplete="email"
-                  type="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  placeholder="you@example.com"
+          <form className="grid gap-3" onSubmit={onSubmit}>
+            {authMode === 'register' && (
+              <div className="grid gap-1.5">
+                <label htmlFor="name" className="text-xs font-medium text-zinc-400">
+                  Name
+                </label>
+                <input
+                  id="name"
+                  autoComplete="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Ashley Santos"
+                  className="h-11 w-full rounded-lg border border-white/10 bg-black/20 px-3 text-sm text-white outline-none placeholder:text-zinc-600 focus:border-white/25 transition-colors"
                 />
               </div>
-              <div className="grid gap-2">
-                <div className="flex items-center justify-between gap-3">
-                  <Label htmlFor="password">Password</Label>
-                  {authMode === 'register' && (
-                    <span className="text-xs text-muted-foreground">
-                      Minimum 8 characters
-                    </span>
-                  )}
-                </div>
-                <Input
+            )}
+
+            <div className="grid gap-1.5">
+              <label htmlFor="email" className="text-xs font-medium text-zinc-400">
+                Email
+              </label>
+              <input
+                id="email"
+                required
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="h-11 w-full rounded-lg border border-white/10 bg-black/20 px-3 text-sm text-white outline-none placeholder:text-zinc-600 focus:border-white/25 transition-colors"
+              />
+            </div>
+
+            <div className="grid gap-1.5">
+              <div className="flex items-center justify-between">
+                <label htmlFor="password" className="text-xs font-medium text-zinc-400">
+                  Password
+                </label>
+                {authMode === 'register' && (
+                  <span className="text-xs text-zinc-600">Min. 8 characters</span>
+                )}
+              </div>
+              <div className="relative">
+                <input
                   id="password"
                   required
-                  autoComplete={
-                    authMode === 'login' ? 'current-password' : 'new-password'
-                  }
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete={authMode === 'login' ? 'current-password' : 'new-password'}
                   minLength={8}
-                  type="password"
                   value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  placeholder={
-                    authMode === 'login'
-                      ? 'Enter your password'
-                      : 'At least 8 characters'
-                  }
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={authMode === 'login' ? 'Enter your password' : 'At least 8 characters'}
+                  className="h-11 w-full rounded-lg border border-white/10 bg-black/20 px-3 pr-10 text-sm text-white outline-none placeholder:text-zinc-600 focus:border-white/25 transition-colors"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? (
+                    <EyeOff className="size-4" aria-hidden="true" />
+                  ) : (
+                    <Eye className="size-4" aria-hidden="true" />
+                  )}
+                </button>
               </div>
-              <Button className="h-11" disabled={isAuthBusy}>
-                {isAuthBusy && <Loader2 className="animate-spin" />}
-                {authMode === 'login' ? 'Open dashboard' : 'Create account'}
-              </Button>
-              {authStatus && (
-                <Alert variant="destructive" role="alert">
-                  <AlertCircle aria-hidden="true" />
-                  <AlertTitle>Authentication failed</AlertTitle>
-                  <AlertDescription>{authStatus}</AlertDescription>
-                </Alert>
-              )}
-            </form>
-
-            <Separator className="my-5" />
-            <div className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-3">
-              <TrustItem icon={LockKeyhole} label="Manual tracking" />
-              <TrustItem icon={WalletCards} label="Account owned" />
-              <TrustItem icon={CheckCircle2} label="Asia/Manila" />
             </div>
-            <p className="mt-5 truncate text-xs text-muted-foreground">
-              System endpoint: {pocketBaseUrl}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    </main>
-  )
-}
 
-function MoneyPreview() {
-  return (
-    <div
-      className="grid max-w-2xl gap-4 rounded-xl border border-primary/10 bg-background/75 p-4 shadow-xl shadow-primary/5 backdrop-blur"
-      aria-label="Kashley dashboard preview"
-    >
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-sm font-medium text-muted-foreground">
-            Available balance
-          </p>
-          <p className="text-3xl font-semibold tracking-normal">₱84,250.00</p>
+            {authStatus && (
+              <p className="text-xs text-rose-400" role="alert">
+                {authStatus}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={isAuthBusy}
+              className="mt-1 h-11 w-full rounded-lg bg-white text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-200 disabled:opacity-40"
+            >
+              {isAuthBusy
+                ? 'Please wait…'
+                : authMode === 'login'
+                  ? 'Sign in'
+                  : 'Create account'}
+            </button>
+          </form>
         </div>
-        <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100">
-          <TrendingUp aria-hidden="true" />
-          +12.4% this month
-        </Badge>
-      </div>
-      <div className="grid gap-3 sm:grid-cols-3">
-        <PreviewStat label="Income" value="+₱36,000" tone="income" />
-        <PreviewStat label="Spend" value="-₱18,420" tone="expense" />
-        <PreviewStat label="Transfer" value="₱9,000" tone="transfer" />
-      </div>
-      <div className="grid gap-2">
-        {[
-          ['Groceries', 'Food', '-₱1,240.00'],
-          ['Payroll', 'Income', '+₱28,000.00'],
-          ['Savings sweep', 'Transfer', '₱4,500.00'],
-        ].map(([merchant, label, amount]) => (
-          <div
-            key={merchant}
-            className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-lg border bg-card px-3 py-2"
-          >
-            <div>
-              <p className="text-sm font-medium">{merchant}</p>
-              <p className="text-xs text-muted-foreground">{label}</p>
-            </div>
-            <p className="text-sm font-semibold">{amount}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
 
-function PreviewStat({
-  label,
-  value,
-  tone,
-}: {
-  label: string
-  value: string
-  tone: 'income' | 'expense' | 'transfer'
-}) {
-  const toneClass = {
-    income: 'border-emerald-200 bg-emerald-50 text-emerald-900',
-    expense: 'border-rose-200 bg-rose-50 text-rose-900',
-    transfer: 'border-sky-200 bg-sky-50 text-sky-900',
-  }[tone]
-
-  return (
-    <div className={`rounded-lg border px-3 py-2 ${toneClass}`}>
-      <p className="text-xs font-medium opacity-75">{label}</p>
-      <p className="text-lg font-semibold">{value}</p>
-    </div>
-  )
-}
-
-function TrustItem({
-  icon: Icon,
-  label,
-}: {
-  icon: typeof LockKeyhole
-  label: string
-}) {
-  return (
-    <div className="flex items-center gap-2">
-      <Icon className="size-4 text-primary" aria-hidden="true" />
-      <span>{label}</span>
-    </div>
+        {/* Footer */}
+        <p className="mt-4 truncate text-center text-[11px] text-zinc-700">
+          {pocketBaseUrl}
+        </p>
+      </motion.div>
+    </main>
   )
 }

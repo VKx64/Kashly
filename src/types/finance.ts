@@ -37,6 +37,7 @@ export interface AccountRecord extends BaseRecord {
   startingBalance: number
   currentBalance: number
   isArchived: boolean
+  qr?: string
 }
 
 export interface CategoryRecord extends BaseRecord {
@@ -66,10 +67,23 @@ export interface TransactionRecord extends BaseRecord {
 export interface BudgetRecord extends BaseRecord {
   user: string
   category: string
-  period: BudgetPeriod
-  month: string
+  name?: string
   amount: number
-  alertThreshold?: number
+  priority?: number
+  icon?: string
+  color?: string
+  isActive?: boolean
+}
+
+export interface AllocationRecord extends BaseRecord {
+  user: string
+  budget?: string
+  goal?: string
+  debt?: string
+  sourceTransaction?: string
+  amount: number
+  date: string
+  note?: string
 }
 
 export interface RecurringTransactionRecord extends BaseRecord {
@@ -93,17 +107,40 @@ export interface GoalRecord extends BaseRecord {
   targetDate?: string
   account?: string
   isCompleted: boolean
+  monthlyTarget?: number
+  priority?: number
+  icon?: string
 }
 
 export interface DebtRecord extends BaseRecord {
   user: string
   name: string
   kind: DebtKind
+  direction?: "owe" | "lent"
   amount: number
   paidAmount: number
   dueDate?: string
   notes?: string
   isArchived: boolean
+  monthlyPayment?: number
+  priority?: number
+  icon?: string
+}
+
+export type SubscriptionFrequency = "weekly" | "monthly" | "yearly"
+
+export interface SubscriptionRecord extends BaseRecord {
+  user: string
+  name: string
+  amount: number
+  account?: string
+  category?: string
+  frequency: SubscriptionFrequency
+  nextBillingDate?: string
+  icon?: string
+  color?: string
+  isActive: boolean
+  notes?: string
 }
 
 export interface FinanceSnapshot {
