@@ -1,7 +1,6 @@
 # syntax=docker/dockerfile:1
 
-# ---- Build the Vite/React frontend ----
-FROM node:22-alpine AS build
+FROM node:22-alpine
 WORKDIR /app
 
 # Install dependencies against the committed lockfile for reproducible builds
@@ -16,9 +15,6 @@ ENV VITE_POCKETBASE_URL=$VITE_POCKETBASE_URL
 COPY . .
 RUN npm run build
 
-# ---- Serve the static build with nginx ----
-FROM nginx:alpine AS runtime
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/dist /usr/share/nginx/html
+# Serve the static build with Vite's built-in preview server (SPA fallback included)
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0", "--port", "80"]
