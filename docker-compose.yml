@@ -1,0 +1,13 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # PocketBase URL is compiled into the frontend at build time.
+        # Set it in a .env file next to this compose file (see .env.example),
+        # or export VITE_POCKETBASE_URL in your shell before `docker compose up`.
+        VITE_POCKETBASE_URL: ${VITE_POCKETBASE_URL}
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    restart: unless-stopped
